@@ -1,0 +1,77 @@
+#application/mysql/mysql-deployment.yaml 
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  ports:
+  - port: 3306
+  selector:
+    app: mysql
+  type: NodePort
+
+#  clusterIP: None
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+      - image: mysql:5.7
+        name: mysql
+        env:
+          -
+            name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: ROOTPWD
+        
+          -
+            name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: DATABASE_URL_KEY
+          -
+            name: DATABASE_NAME
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: DATABASE_NAME
+          -
+            name: DATABASE_USER
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: DATABASE_USER
+          -
+            name: DATABASE_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: DATABASE_PASSWORD
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+

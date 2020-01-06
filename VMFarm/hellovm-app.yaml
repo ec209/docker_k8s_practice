@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+spec:
+  selector:
+    matchLabels:
+      type: app
+      service: python
+  template:
+    metadata:
+      labels:
+        type: app
+        service: python
+    spec:
+      containers:
+      - name: python
+        image: ec209/hellodocker:0.0.1
+        command:
+        env:
+        - name: python_HOST
+          value: "python"
+        - name: python_PORT
+          value: "8080"
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: python
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 8000
+    targetPort: 4567
+    protocol: TCP
+  selector:
+    type: app
+    service: python
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python
+spec:
+  selector:
+    matchLabels:
+      type: db
+      service: python
+  template:
+    metadata:
+      labels:
+        type: db
+        service: python
+    spec:
+      containers:
+      - name: python
+        image: python
+        command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+        ports:
+        - containerPort: 6379
+          protocol: TCP
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: python
+spec:
+  ports:
+  - port: 6379
+    protocol: TCP
+  selector:
+    type: db
+    service: python
+

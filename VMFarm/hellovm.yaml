@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: python
+  labels:
+    type: app
+spec:
+  containers:
+  - name: app
+    image: ec209/python:ver3
+    command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+

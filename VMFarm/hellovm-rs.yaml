@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: python-rs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      type: app
+      service: python
+  template:
+    metadata:
+      labels:
+        type: app
+        service: python
+    spec:
+      containers:
+      - name: python
+        image: ec209/python:ver3
+        command: [ "/bin/bash", "-ce", "tail -f /dev/null" ]
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 4567
+

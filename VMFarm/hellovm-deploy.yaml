@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hellovm-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      type: app
+      service: hellovm
+  template:
+    metadata:
+      labels:
+        type: app
+        service: hellovm
+    spec:
+      containers:
+      - name: hellovm
+        image: ec209/hellodocker:0.0.1
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+
